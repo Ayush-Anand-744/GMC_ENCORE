@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GMC ENCORE</title>
+  <link rel="stylesheet" href="/static/style.css?v=1.1.3">
+</head>
+<body>
+<header>
+  <div class="brand"><strong>GMC</strong><div><b>Quote Preparation Automation</b><small>AI + rules · Classification → Extraction → Demography → Generation</small></div></div>
+  <div class="steps"><span>AI: auto · rules only</span><span>1 Extraction</span><span>2 Demography</span><span>3 Generation</span></div>
+</header>
+<main>
+  <section class="card upload-card">
+    <h3>Case File Upload</h3>
+    <p>Upload one or multiple files for this case. Supported: Excel, PDF, Word, Email, Images, CSV/Text.</p>
+    <label id="drop" class="drop">
+      <div class="clip">⌕</div><b>Drop files here or click to browse</b>
+      <small>Support: Excel, PDF, Word, Email, Images, and Text files</small>
+      <input id="files" type="file" multiple hidden>
+    </label>
+    <div id="fileList" class="files"></div>
+    <div class="mode">
+      <b>Policy Proposal Date Mode</b>
+      <div><span>Current Date</span><label class="switch"><input id="dateMode" type="checkbox"><span class="slider"></span></label><span>Use Policy Proposal Start Date</span><input id="policyDate" type="date" disabled></div>
+      <small>Age logic: use valid Age from demography only when DOB is unavailable; otherwise compute completed years from DOB using the selected reference date.</small>
+    </div>
+    <div class="actions"><button id="process">Process RFQs</button></div>
+    <div id="status" class="status"></div>
+  </section>
+</main>
+<div id="modal" class="modal hidden">
+  <div class="modal-box"><h3>Protected File</h3><p id="modalText"></p><input id="pwd" type="password" placeholder="Enter password"><div id="pwdError" class="error"></div><div class="modal-actions"><button id="pwdCancel" class="secondary">Cancel</button><button id="pwdOk">Unlock & Continue</button></div></div>
+</div>
+<footer>GMC Quote Automation · Extraction → Demography → Generation · ENCORE</footer>
+<script src="/static/app.js?v=1.1.3"></script>
+</body>
+</html>

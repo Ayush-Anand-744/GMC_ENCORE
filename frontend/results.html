@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Processed RFQs Data · GMC ENCORE</title>
+  <link rel="stylesheet" href="/static/style.css?v=1.1.3">
+</head>
+<body>
+<header>
+  <div class="brand"><strong>GMC</strong><div><b>Quote Preparation Automation</b><small>AI + rules · Classification → Extraction → Demography → Generation</small></div></div>
+  <div class="steps"><span>AI: auto · rules only</span><span>1 Extraction</span><span>2 Demography</span><span>3 Generation</span></div>
+</header>
+<main class="results-main">
+  <section class="card results-card">
+    <div class="results-topbar">
+      <div id="sourceTabs" class="source-tabs"></div>
+      <a class="secondary-link" href="/">← Upload New Case</a>
+    </div>
+    <div class="tabs result-nav" id="mainTabs">
+      <button data-tab="quote" class="active">Quote Form Data</button>
+      <button data-tab="hospital">Hospitalization & Treatment</button>
+      <button data-tab="additional">Additional Details</button>
+      <button data-tab="demo">Demographic Data</button>
+      <button data-tab="demography-exception">Demography Exception</button>
+      <button data-tab="deviations">Deviation / Cover Not Available</button>
+      <button data-tab="quote-exception">Quote Exception</button>
+      <button data-tab="extracted">Extracted Data</button>
+    </div>
+    <div id="tableFilterBar" class="filter-bar">
+      <button data-filter="all" class="filter active">All</button>
+      <button data-filter="review" class="filter">Needs Review</button>
+      <button data-filter="conflicts" class="filter">Conflicts</button>
+    </div>
+    <div id="panel"><div class="loading">Loading processed RFQs data…</div></div>
+  </section>
+  <section id="summary" class="card"></section>
+  <section id="downloads" class="card">
+    <h3>Download Results</h3><p>Download generated outputs as Excel workbooks.</p>
+    <div class="download-row"><button data-kind="quote" class="green">↓ Quote Sheet</button><button data-kind="demography" class="green">↓ Standardized Demography</button><button data-kind="all" class="green">↓ Download All Results (Excel)</button></div>
+  </section>
+</main>
+<footer>GMC Quote Automation · Extraction → Demography → Generation · ENCORE</footer>
+<script src="/static/results.js?v=1.1.3"></script>
+</body>
+</html>

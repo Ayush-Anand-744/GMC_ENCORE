@@ -1,0 +1,43 @@
+SME_THRESHOLD = 250
+
+DROPDOWN_MASTERS = {
+    "Policy Tenure": ["1 Year"],
+    "Group Category": ["Employer-Employee", "Non-Employer-Employee"],
+    "Type of Proposal": ["New Business", "Roll Over", "Own Renewal"],
+    "Premium Payer": ["Insured", "GroupManager"],
+    "Beneficiary": ["Employee/Nominee"],
+    "Plan": ["Individual", "Floater"],
+    "Zone": ["Zone A", "Zone B", "Zone C", "Zone D", "Pan India"],
+    "Policy Type": ["Base IPD", "Base OPD/Structured OPD/HPR", "Corporate Buffer", "Critical Illness", "Dependent Only", "Parental IPD", "Parental Top Up/Super Top IPD", "Wellness"],
+    "Claim Servicing": ["In House", "TPA"],
+    "Client Industry Type": ["IT and ITES", "Manufacturing", "Aviation", "Media and Entertainment", "Pharmaceuticals", "Real Estate", "Hospitality", "Healthcare and Hospitals", "Education and Training", "Insurance", "Bank", "NBFC", "Other Financial Institution", "NGO/Trust", "Association", "Society", "SHG", "Club", "Military/Para Military Force", "Police Force", "Law Enforcement Agencies", "Political Party/Firms", "Grocery/Kirana Stores", "Gymkhanas", "Religious Group", "Any Kind of Shops", "Event Management Companies/Teams", "Mining Industry", "Sea-Voyage Carriers", "Film Industry", "Adventure Sport Organizations", "Tourism Industry", "Agriculture Industry", "Logistics and Transportation", "Others"],
+    "Pre-Existing & Specified Disease": ["Covered", "Waived Off", "Applicable", "Not Covered", "Not Found", "Not Applicable"],
+    "Initial Waiting Period": ["Covered", "Waived Off", "Applicable", "Not Covered", "Not Found", "Not Applicable", "15 Days", "30 Days"],
+    "Room Rent": ["Not Applicable", "Rent up to Single Private Room", "Rent up to Twin Sharing", "Rent in General Ward", "0.5% of SI max up to 2500", "1% of SI max up to 5000", "1.5% of SI max up to 7000", "2% of SI max up to 7500"],
+    "Pre Hospitalization": ["0", "15", "30", "60", "90", "120"],
+    "Post Hospitalization": ["0", "30", "60", "90", "120", "180"],
+    "Medical Advancement Surgery": ["Upto 25% SI", "Upto 50% SI", "Upto SI"],
+    "Maternity Expenses/Benefits": ["Covered", "Waived Off", "Not Covered", "Not Found", "Not Applicable"],
+    "Number of Deliveries/Kids Covered": ["1", "2", "3"],
+    "Maternity Waiting Period": ["9 Months Waiting Period", "No Waiting Period", "Covered", "Waived Off", "Applicable", "Not Covered", "Not Found", "Not Applicable"],
+    "AYUSH Treatment": ["25000"],
+    "Co-pay on all claims": ["No Co-pay", "10% Copay", "15% Copay", "20% Copay", "25% Copay", "30% Copay", "Not Applicable"],
+    "Co-Payment on All Parental Claims only": ["No Co-pay", "10% Copay", "15% Copay", "20% Copay", "25% Copay", "30% Copay", "Not Applicable"],
+    "Co-pay for Specified Illness": ["No Co-pay", "10% Copay", "15% Copay", "20% Copay", "25% Copay", "30% Copay", "50% Copay", "Not Applicable"],
+    "Waiver of Cataract Sublimit": ["Covered", "Waived Off", "Applicable", "Not Covered", "Not Found", "Not Applicable"],
+}
+
+DEFAULTS = {
+    "Policy Tenure": "1 Year",
+    "Group Category": "Employer-Employee",
+    "Type of Proposal": "New Business",
+    "Premium Payer": "GroupManager",
+    "Beneficiary": "Employee/Nominee",
+    "Plan": "Individual",
+    "Rater Type": "-",
+    "Zone": "Pan India",
+    "Policy Type": "Base IPD",
+    "Claim Servicing": "In House",
+    "TPA": "In House Administration Team",
+    "Client Industry Type": "Others",
+}
