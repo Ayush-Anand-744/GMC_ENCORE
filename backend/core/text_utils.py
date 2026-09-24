@@ -7,6 +7,7 @@ NEGATIVE_VARIANTS = {"not found", "not applicable", "not covered", "waived off",
 def clean_text(value) -> str:
     if value is None: return ""
     text = str(value).replace("\u00a0", " ")
+    text = re.sub(r"_x[0-9a-fA-F]{4}_", " ", text)
     return re.sub(r"\s+", " ", text).strip()
 
 def norm(value) -> str:
@@ -29,6 +30,10 @@ def normalize_for_match(value: str) -> str:
     return norm(equivalent_label(value))
 
 def best_allowed_match(value: str, allowed: list[str], threshold: float = 0.75):
+    if not value or not allowed: return None
+    nv = norm(value)
+    if nv == "fresh" and "New Business" in allowed:
+        return "New Business"
     if not value or not allowed: return None
     nv = norm(value)
     # 1. Exact norm match

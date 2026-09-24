@@ -199,18 +199,13 @@ def decompose_field_group(raw_text: str, group: dict, source_column: str = "cove
                         valid_value = m_days.group(1).lower()
 
             elif expected_type == "amount":
-                if fname == "Maternity Limit – Normal Delivery":
-                    m_norm = re.search(r"(\d{4,6})\s*(?:for\s*)?normal", unit, re.I)
-                    if not m_norm:
-                        m_norm = re.search(r"normal[^\d]*(\d{4,6})", unit, re.I)
-                    if m_norm:
-                        valid_value = m_norm.group(1)
-                elif fname == "Maternity Limit – C Section Delivery":
-                    m_csec = re.search(r"(?:c-section|c section|cesarean)[^\d]*(\d{4,6})", unit, re.I)
-                    if not m_csec:
-                        m_csec = re.search(r"(\d{4,6})[^\d]*(?:c-section|c section|cesarean)", unit, re.I)
-                    if m_csec:
-                        valid_value = m_csec.group(1)
+                m_amt = re.search(r"(?:inr|rs\.?|₹)?\s*(\d{1,3}(?:,\d{3})+|\d{4,7})", unit, re.I)
+                if m_amt:
+                    valid_value = m_amt.group(1).replace(",", "")
+                else:
+                    if parent_field:
+                        assignments[parent_field] = unit
+                    continue
 
             # Step 7: Shared trailing clauses / assign to child field
             if fname not in assignments:
@@ -306,7 +301,7 @@ def _field_for_label(label: str):
     # Disambiguation rules
     if nl in {"location", "city", "address"}:
         return None
-    if "group mediclaim benefits" in nl or nl in {"company name", "organization name", "client name", "proposer name", "employer name", "policyholder name"}:
+    if "group mediclaim benefits" in nl or nl in {"company name", "organization name", "client name", "proposer name", "employer name", "policyholder name", "corporate name", "name of company", "name of organization"}:
         return "Organization Name"
     if "policy scope type" in nl or "scope of policy" in nl:
         return "Plan"
@@ -459,9 +454,7 @@ def parse_structured_tables(read_results):
                 if num_cols == 2:
                     coverage_cols = [1]
                 elif num_cols >= 3:
-                    coverage_cols = [1]
-                    if not proposed_cols:
-                        proposed_cols = [2]
+                    coverage_cols = [1, 2] if not proposed_cols else [1]
 
             last_mapped_field = None
             for r_idx in range(start_row, len(df)):
@@ -585,6 +578,20 @@ def build_rows(text: str, demography_summary: dict | None = None, read_results=N
         zone = resolve_zone(text)
         if zone != "Pan India": extracted["Zone"] = zone
 
+    # Plan & Policy Type Disambiguation (§12.2)
+    if "Policy Type" in extracted:
+        pt_val = clean_text(extracted["Policy Type"])
+        if pt_val.lower() in {"family floater", "floater", "individual"}:
+            extracted["Plan"] = pt_val
+            del extracted["Policy Type"]
+
+    if "Plan" in extracted:
+        p_val = clean_text(extracted["Plan"])
+        if p_val.lower() == "covered":
+            extracted["Plan"] = "Floater"
+        elif best_allowed_match(p_val, ["Individual", "Floater", "Family Floater"]):
+            extracted["Plan"] = best_allowed_match(p_val, ["Individual", "Floater", "Family Floater"])
+
     if "Plan" in extracted and best_allowed_match(extracted["Plan"], DROPDOWN_MASTERS.get("Policy Type", [])):
         extracted["Policy Type"] = best_allowed_match(extracted["Plan"], DROPDOWN_MASTERS["Policy Type"])
 
@@ -595,18 +602,44 @@ def build_rows(text: str, demography_summary: dict | None = None, read_results=N
 
     unmatched_notes = []
 
+    METADATA_FIELDS = {"Organization Name", "PIN Code", "State", "District", "Client Industry Type", "Group Size", "Number of Primary Members", "Flagging SME"}
+
     def make_row(section, field, allow_defaults):
         pair = structured.get(field, {})
         raw = pair.get("coverage") or extracted.get(field)
         proposed = pair.get("proposed") or "Not Available"
         valid = None; unmatched = None
 
-        if field == "Brokerage%":
+        # Re-route metadata fields from proposed to coverage if coverage is empty
+        if field in METADATA_FIELDS and proposed != "Not Available" and (raw in (None, "") or raw == "Not Available"):
+            raw = proposed
+            proposed = "Not Available"
+
+        # Suppress self-label extraction (when extracted text is just the field name itself)
+        if raw not in (None, ""):
+            cr = clean_text(raw)
+            # Extended self-label suppression for repeating table headers without data
+            norm_cr = norm(cr)
+            norm_field = norm(field)
+            field_syns = {norm(s) for s in FIELD_SYNONYMS.get(field, [])}
+            is_repeating_label = (norm_cr == norm_field or norm_cr in field_syns or cr.lower() in HEADER_EXACT)
+            has_data_keywords = any(k in cr.lower() for k in ["inr", "rs", "covered", "waived", "applicable", "days", "lacs", "lakhs", "%", "limit", "no capping", "at actuals", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"])
+            if is_repeating_label and not has_data_keywords:
+                raw = None
+                raw = None
+
+        if field in METADATA_FIELDS and raw not in (None, ""):
+            display = clean_text(raw)
+            status = "Derived" if field in {"Group Size", "Number of Primary Members", "Flagging SME"} else "RFQ Data"
+        elif field == "Brokerage%":
             display = ""; status = "Not Available"
         elif raw not in (None, ""):
             display = clean_text(raw)
             status = "RFQ Data"
-            if field in DROPDOWN_MASTERS:
+            if field in {"Maternity Expenses/Benefits", "Room Rent for Normal Room", "Room Rent for ICU & Specialty Rooms"}:
+                # Parent umbrella or flexible amount/tier fields (§15.4)
+                valid = True
+            elif field in DROPDOWN_MASTERS:
                 match = best_allowed_match(display, DROPDOWN_MASTERS[field])
                 if match:
                     valid = True
@@ -616,7 +649,7 @@ def build_rows(text: str, demography_summary: dict | None = None, read_results=N
                     valid = False
                     unmatched = display
                     unmatched_notes.append(f'Unmatched word "{unmatched}" was detected for {field}')
-        elif pair.get("proposed"):
+        elif pair.get("proposed") and pair.get("proposed") != "Not Available":
             display = "Not Available"; status = "RFQ Data"
         elif allow_defaults and field in DEFAULTS:
             display = DEFAULTS[field]; status = "Default Data"
